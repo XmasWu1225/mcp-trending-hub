@@ -1,6 +1,5 @@
 # 🔥 MCP Trending Hub
 
-> Forked from [fancyboi999/daily-hot-mcp](https://github.com/fancyboi999/daily-hot-mcp)
 
 基于 Model Context Protocol (MCP) 协议的全网热点趋势一站式聚合服务
 
