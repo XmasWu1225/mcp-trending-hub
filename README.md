@@ -1,4 +1,6 @@
-# 🔥 Daily Hot MCP
+# 🔥 MCP Trending Hub
+
+> Forked from [fancyboi999/daily-hot-mcp](https://github.com/fancyboi999/daily-hot-mcp)
 
 基于 Model Context Protocol (MCP) 协议的全网热点趋势一站式聚合服务
 
@@ -13,8 +15,8 @@
 ## 📦 安装
 
 ```bash
-git clone https://github.com/XmasWu1225/daily-hot-mcp.git
-cd daily-hot-mcp
+git clone https://github.com/XmasWu1225/mcp-trending-hub.git
+cd mcp-trending-hub
 pip install -e .
 ```
 
