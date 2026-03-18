@@ -3,10 +3,12 @@
 import asyncio
 import time
 from datetime import datetime
-from pydantic import Field
 from typing import Annotated
-from daily_hot_mcp.utils import http_client
+
 from fastmcp.tools import Tool
+from pydantic import Field
+
+from daily_hot_mcp.utils import http_client
 
 # 定义可选的类型映射
 LIST_TYPE_MAP = {
@@ -16,12 +18,15 @@ LIST_TYPE_MAP = {
     "collect": "collectList",
 }
 
+
 # 主函数
 async def get_36kr_trending_func(
     type: Annotated[
         str,
-        Field(description="分类: hot(人气榜), video(视频榜), comment(热议榜), collect(收藏榜)")
-    ] = "hot"
+        Field(
+            description="分类: hot(人气榜), video(视频榜), comment(热议榜), collect(收藏榜)"
+        ),
+    ] = "hot",
 ) -> list:
     """获取36氪热榜数据"""
 
@@ -46,7 +51,7 @@ async def get_36kr_trending_func(
     response = await http_client.post(
         f"https://gateway.36kr.com/api/mis/nav/home/nav/rank/{type}",
         json=payload,
-        headers=headers
+        headers=headers,
     )
     response.raise_for_status()
 
@@ -66,7 +71,9 @@ async def get_36kr_trending_func(
         if publish_time_str:
             try:
                 if isinstance(publish_time_str, (int, float)):
-                    publish_time_iso = datetime.fromtimestamp(publish_time_str / 1000).isoformat()
+                    publish_time_iso = datetime.fromtimestamp(
+                        publish_time_str / 1000
+                    ).isoformat()
                 elif isinstance(publish_time_str, str):
                     publish_time_iso = publish_time_str
             except (ValueError, TypeError):
@@ -86,11 +93,14 @@ async def get_36kr_trending_func(
         if publish_time_iso:
             result_item["publish_time"] = publish_time_iso
         if template_material.get("itemId"):
-            result_item["link"] = f"https://www.36kr.com/p/{template_material['itemId']}"
+            result_item["link"] = (
+                f"https://www.36kr.com/p/{template_material['itemId']}"
+            )
 
         results.append(result_item)
 
     return results
+
 
 # 注册工具
 kr36_tool_config = Tool.from_function(
@@ -99,14 +109,14 @@ kr36_tool_config = Tool.from_function(
     description="获取 36 氪热榜，提供创业、商业、科技领域的热门资讯，包含投融资动态、新兴产业分析和商业模式创新信息",
 )
 
-kr36_hot_tools = [
-    kr36_tool_config
-]
+kr36_hot_tools = [kr36_tool_config]
+
 
 # 测试入口
 def main():
     result = asyncio.run(get_36kr_trending_func(type="hot"))
     print(f"结果是：{result}")
+
 
 if __name__ == "__main__":
     main()

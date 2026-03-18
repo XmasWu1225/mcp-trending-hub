@@ -1,30 +1,38 @@
 from fastmcp import FastMCP
-from daily_hot_mcp.utils.logger import logger
-from daily_hot_mcp.tools import all_tools
 
-# 重命名变量，使其符合 mcp dev 命令的预期
-server = FastMCP(name = "daily-hot-mcp")
+from daily_hot_mcp.tools import all_tools
+from daily_hot_mcp.utils.config import config
+from daily_hot_mcp.utils.logger import logger
+
+server = FastMCP(name="daily-hot-mcp")
 
 for tool in all_tools:
     server.add_tool(tool)
     logger.info(f"Registered tool: {tool.name}")
 
-def run_http(host: str, port: int, path: str, log_level: str):
-    """Run Daily Hot MCP server in HTTP mode."""
+
+def run_http() -> None:
+    """运行HTTP模式服务器"""
+    server_config = config.server
     try:
-        logger.info(f"Starting Daily Hot MCP server with HTTP transport (http://{host}:{port}{path})")
+        logger.info(
+            f"Starting Daily Hot MCP server with HTTP transport "
+            f"(http://{server_config.host}:{server_config.port}{server_config.path})"
+        )
         server.run(
             transport="http",
-            host=host,
-            port=port,
-            path=path,
-            log_level=log_level
+            host=server_config.host,
+            port=server_config.port,
+            path=server_config.path,
+            log_level=server_config.log_level,
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
 
-def main():
-    run_http("0.0.0.0", 8000, "/mcp", "INFO")
+
+def main() -> None:
+    run_http()
+
 
 if __name__ == "__main__":
     main()

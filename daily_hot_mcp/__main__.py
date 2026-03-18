@@ -3,4 +3,4 @@
 from daily_hot_mcp.server import main
 
 if __name__ == "__main__":
-    main() 
+    main()

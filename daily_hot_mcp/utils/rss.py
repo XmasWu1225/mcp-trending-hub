@@ -1,8 +1,10 @@
 """RSS解析模块"""
 
-import feedparser
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin
+
+import feedparser
+
 from .http import http_client
 
 
@@ -12,13 +14,13 @@ async def parse_rss(url: str) -> List[Dict[str, Any]]:
         # 获取RSS内容
         response = await http_client.get(url)
         response.raise_for_status()
-        
+
         # 解析RSS
         feed = feedparser.parse(response.text)
-        
+
         if not feed.entries:
             return []
-        
+
         results = []
         for entry in feed.entries:
             item = {
@@ -28,7 +30,7 @@ async def parse_rss(url: str) -> List[Dict[str, Any]]:
                 "author": getattr(entry, "author", ""),
                 "publish_time": getattr(entry, "published", ""),
             }
-            
+
             # 处理封面图片
             cover = None
             if hasattr(entry, "media_content") and entry.media_content:
@@ -38,14 +40,14 @@ async def parse_rss(url: str) -> List[Dict[str, Any]]:
                     if enclosure.get("type", "").startswith("image/"):
                         cover = enclosure.get("href")
                         break
-            
+
             if cover:
                 item["cover"] = cover
-            
+
             results.append(item)
-        
+
         return results
-    
+
     except Exception as e:
         raise Exception(f"解析RSS失败: {str(e)}")
 
@@ -61,20 +63,20 @@ async def get_rss(url: str) -> Dict[str, Any]:
         # 获取RSS内容
         response = await http_client.get(url)
         response.raise_for_status()
-        
+
         # 解析RSS
         feed_data = feedparser.parse(response.text)
-        
+
         # 转换为字典格式
         result = {
             "feed": {
                 "title": getattr(feed_data.feed, "title", ""),
                 "description": getattr(feed_data.feed, "description", ""),
                 "link": getattr(feed_data.feed, "link", ""),
-                "entry": []
+                "entry": [],
             }
         }
-        
+
         # 添加条目
         for entry in feed_data.entries:
             entry_dict = {
@@ -86,8 +88,8 @@ async def get_rss(url: str) -> Dict[str, Any]:
                 "author": getattr(entry, "author", ""),
             }
             result["feed"]["entry"].append(entry_dict)
-        
+
         return result
-    
+
     except Exception as e:
-        raise Exception(f"获取RSS数据失败: {str(e)}") 
+        raise Exception(f"获取RSS数据失败: {str(e)}")

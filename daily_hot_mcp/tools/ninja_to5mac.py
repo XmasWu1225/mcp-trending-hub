@@ -1,8 +1,10 @@
 """9to5Mac新闻工具"""
 
 import asyncio
-from daily_hot_mcp.utils import get_rss_items
+
 from fastmcp.tools import Tool
+
+from daily_hot_mcp.utils import get_rss_items
 
 
 async def get_9to5mac_news_func() -> list:
@@ -16,13 +18,13 @@ get_ninja_to5mac_tool = Tool.from_function(
     fn=get_9to5mac_news_func,
 )
 
-ninja_to5mac_hot_tools = [
-    get_ninja_to5mac_tool
-] 
+ninja_to5mac_hot_tools = [get_ninja_to5mac_tool]
+
 
 def main():
     result = asyncio.run(get_9to5mac_news_func())
     print(f"结果是{result}")
+
 
 if __name__ == "__main__":
     main()

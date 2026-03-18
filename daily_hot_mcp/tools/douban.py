@@ -2,9 +2,11 @@
 
 import asyncio
 from typing import Annotated
-from pydantic import Field
-from daily_hot_mcp.utils import http_client
+
 from fastmcp.tools import Tool
+from pydantic import Field
+
+from daily_hot_mcp.utils import http_client
 
 URL_MAP = {
     "subject": "https://m.douban.com/rexxar/api/v2/subject_collection/subject_real_time_hotest/items",
@@ -12,10 +14,16 @@ URL_MAP = {
     "tv": "https://m.douban.com/rexxar/api/v2/subject_collection/tv_real_time_hotest/items",
 }
 
+
 async def get_douban_rank_func(
-    rank_type: Annotated[str, Field(description="榜单类型：subject(图书、电影、电视剧、综艺等), movie(电影), tv(电视剧)")] = "subject",
+    rank_type: Annotated[
+        str,
+        Field(
+            description="榜单类型：subject(图书、电影、电视剧、综艺等), movie(电影), tv(电视剧)"
+        ),
+    ] = "subject",
     start: Annotated[int, Field(description="起始位置")] = 0,
-    count: Annotated[int, Field(description="返回结果数量")] = 10
+    count: Annotated[int, Field(description="返回结果数量")] = 10,
 ) -> list:
     """获取豆瓣实时热门榜数据"""
     if rank_type not in URL_MAP:
@@ -30,7 +38,7 @@ async def get_douban_rank_func(
         },
         headers={
             "Referer": "https://m.douban.com/subject_collection/movie_real_time_hotest",
-        }
+        },
     )
     response.raise_for_status()
     data = response.json()
@@ -55,11 +63,18 @@ async def get_douban_rank_func(
             result_item["rating_value"] = rating.get("value")
         related_terms = item.get("related_search_terms", [])
         if related_terms:
-            hashtags = " ".join([f"#{term.get('name', '')}" for term in related_terms if term.get('name')])
+            hashtags = " ".join(
+                [
+                    f"#{term.get('name', '')}"
+                    for term in related_terms
+                    if term.get("name")
+                ]
+            )
             if hashtags:
                 result_item["hashtags"] = hashtags
         results.append(result_item)
     return results
+
 
 douban_rank_tool = Tool.from_function(
     fn=get_douban_rank_func,
@@ -67,13 +82,13 @@ douban_rank_tool = Tool.from_function(
     description="获取豆瓣实时热门榜单，提供当前热门的图书、电影、电视剧、综艺等作品信息，包含评分和热度数据",
 )
 
-douban_hot_tools = [
-    douban_rank_tool
-]
+douban_hot_tools = [douban_rank_tool]
+
 
 def main():
     result = asyncio.run(get_douban_rank_func(rank_type="movie", start=0, count=2))
     print(f"结果是：{result}")
+
 
 if __name__ == "__main__":
     main()
